@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BytteApp", "BytteApp\BytteApp.csproj", "{CF3AACCE-7FDD-4E91-ADEA-2F8C8AFBAEA1}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{1CD80BE5-68F9-4978-B847-DF759C0EFD81}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{CF3AACCE-7FDD-4E91-ADEA-2F8C8AFBAEA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{CF3AACCE-7FDD-4E91-ADEA-2F8C8AFBAEA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{CF3AACCE-7FDD-4E91-ADEA-2F8C8AFBAEA1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
