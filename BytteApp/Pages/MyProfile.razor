@@ -1,0 +1,342 @@
+@page "/myprofile"
+
+
+
+<PageTitle>My Profile</PageTitle>
+
+<h2>Min profil</h2>
+<!-- Kun til test: vælg hvilken bruger der vises -->
+<div class="mb-3 d-flex align-items-center gap-2">
+    <label for="userSelect" class="form-label mb-0">Vælg testbruger:</label>
+    <select id="userSelect" class="form-select w-auto" @onchange="OnSelectedUserChanged">
+        @foreach (var u in allUsers)
+        {
+            <option value="@u.Id" selected="@(u.Id == selectedUserId)">
+                @u.DisplayName
+            </option>
+        }
+    </select>
+</div>
+
+@if (isLoading)
+{
+    <p><em>Loading profile...</em></p>
+}
+else if (!string.IsNullOrEmpty(loadError))
+{
+    <div class="alert alert-danger">@loadError</div>
+}
+else
+{
+    <div class="row g-4">
+        <!-- Boks 1: Brugerinformation -->
+        <!-- Boks 1: Brugerinformation -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">Brugerinformation</h5>
+                </div>
+
+                @if (userInfo == null)
+                {
+                    <div class="card-body">
+                        <p>Ingen brugerdata fundet.</p>
+                    </div>
+                }
+                else
+                {
+                    <!-- Brug Bootstrap flex her -->
+                    <div class="card-body d-flex align-items-start gap-3">
+                        <div class="flex-shrink-0">
+                            <img src="@userInfo.ProfileImageUrl"
+                                 alt="Profilbillede"
+                                 class="profile-image rounded-circle" />
+                        </div>
+
+                        <div class="flex-grow-1">
+                            <dl class="row mb-0">
+                                <dt class="col-sm-4">Navn</dt>
+                                <dd class="col-sm-8">@userInfo.Name</dd>
+
+                                <dt class="col-sm-4">Email</dt>
+                                <dd class="col-sm-8">@userInfo.Email</dd>
+
+                                <dt class="col-sm-4">Brugernavn</dt>
+                                <dd class="col-sm-8">@userInfo.UserName</dd>
+
+                                <dt class="col-sm-4">Rolle</dt>
+                                <dd class="col-sm-8">@userInfo.Role</dd>
+
+                                <dt class="col-sm-4">Telefon</dt>
+                                <dd class="col-sm-8">@userInfo.Phone</dd>
+
+                                <dt class="col-sm-4">Adresse</dt>
+                                <dd class="col-sm-8">@userInfo.Address</dd>
+
+                                <dt class="col-sm-4">Medlem siden</dt>
+                                <dd class="col-sm-8">@userInfo.MemberSince.ToShortDateString()</dd>
+                            </dl>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+
+        <!-- Boks 2: Aktive annoncer -->
+        <div class="col-12 col-lg-6">
+            <div class="card shadow-sm">
+                <div class="card-header bg-success text-white">
+                    <h5 class="mb-0">Mine aktive annoncer</h5>
+                </div>
+                <div class="card-body">
+                    @if (activeListings == null || !activeListings.Any())
+                    {
+                        <p>Du har ingen aktive annoncer.</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Titel</th>
+                                    <th>Pris</th>
+                                    <th>Oprettet</th>
+                                    <th>Status</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var listing in activeListings)
+                                {
+                                    <tr>
+                                        <td>@listing.Title</td>
+                                        <td>@listing.Price.ToString("C")</td>
+                                        <td>@listing.CreatedAt.ToShortDateString()</td>
+                                        <td>
+                                            <span class="badge bg-success">Aktiv</span>
+                                        </td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Boks 3: Solgte / inaktive annoncer (grå) -->
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-secondary text-white">
+                    <h5 class="mb-0">Mine solgte og inaktive annoncer</h5>
+                </div>
+                <div class="card-body">
+                    @if (inactiveOrSoldListings == null || !inactiveOrSoldListings.Any())
+                    {
+                        <p>Du har ingen solgte eller inaktive annoncer.</p>
+                    }
+                    else
+                    {
+                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
+                            @foreach (var listing in inactiveOrSoldListings)
+                            {
+                                var isSold = listing.Status.Equals("sold", StringComparison.OrdinalIgnoreCase);
+                                <div class="col">
+                                    <div class="card h-100 bg-light text-muted">
+                                        <div class="card-body">
+                                            <h6 class="card-title">@listing.Title</h6>
+                                            <p class="card-text mb-1">Pris: @listing.Price.ToString("C")</p>
+                                            <p class="card-text mb-1">Oprettet: @listing.CreatedAt.ToShortDateString()</p>
+                                            <p class="card-text mb-2">Sidst opdateret: @listing.UpdatedAt.ToShortDateString()</p>
+                                            <span class="badge @(isSold ? "bg-dark" : "bg-secondary")">
+                                                @(isSold ? "Solgt" : "Inaktiv")
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            }
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+
+        <!-- Boks 4: Indkøbshistorik -->
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-info text-white">
+                    <h5 class="mb-0">Min indkøbshistorik</h5>
+                </div>
+                <div class="card-body">
+                    @if (purchaseHistory == null || !purchaseHistory.Any())
+                    {
+                        <p>Du har endnu ikke købt nogle genstande.</p>
+                    }
+                    else
+                    {
+                        <div class="table-responsive">
+                            <table class="table table-striped table-sm align-middle">
+                                <thead>
+                                <tr>
+                                    <th>Vare</th>
+                                    <th>Pris</th>
+                                    <th>Købsdato</th>
+                                    <th>Sælger</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                @foreach (var purchase in purchaseHistory)
+                                {
+                                    <tr>
+                                        <td>@purchase.ItemTitle</td>
+                                        <td>@purchase.Price.ToString("C")</td>
+                                        <td>@purchase.PurchasedAt.ToShortDateString()</td>
+                                        <td>@purchase.SellerName</td>
+                                    </tr>
+                                }
+                                </tbody>
+                            </table>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code {
+    // Kun UI-tilstande – senere erstatter du SeedDummyData() med kald til dine services.
+    private bool isLoading = true;
+    private string? loadError;
+
+    private MyProfileUserInfo? userInfo;
+    private List<MyProfileListing> activeListings = new();
+    private List<MyProfileListing> inactiveOrSoldListings = new();
+    private List<MyProfilePurchase> purchaseHistory = new();
+
+    protected override async Task OnInitializedAsync()
+    {
+        try
+        {
+            // Her kan du senere hente "user" fra localStorage og kalde dine service-klasser.
+            // User? loggedIn = await localStorage.GetItemAsync<User?>("user");
+            // Hvis I har en MyProfileService, kan du bruge den her til at hente data fra API/MongoDb.
+
+            SeedDummyData(); // Midlertidigt så UI virker
+        }
+        catch (Exception ex)
+        {
+            loadError = ex.Message;
+        }
+        finally
+        {
+            isLoading = false;
+        }
+    }
+
+    // Midlertidige modeller KUN til UI.
+    private class MyProfileUserInfo
+    {
+        public string? ProfileImageUrl { get; set; }
+        public string Name { get; set; } = "";
+        public string Email { get; set; } = "";
+        public string UserName { get; set; } = "";
+        public string Role { get; set; } = "";
+        public string Phone { get; set; } = "";
+        public string Address { get; set; } = "";
+        public DateTime MemberSince { get; set; }
+    }
+
+    private class MyProfileListing
+    {
+        public string Title { get; set; } = "";
+        public decimal Price { get; set; }
+        public string Status { get; set; } = "";
+        public DateTime CreatedAt { get; set; }
+        public DateTime UpdatedAt { get; set; }
+    }
+
+    private class MyProfilePurchase
+    {
+        public string ItemTitle { get; set; } = "";
+        public decimal Price { get; set; }
+        public DateTime PurchasedAt { get; set; }
+        public string SellerName { get; set; } = "";
+    }
+
+    // Dummy-data – fjernes når vi kobler til vores services/API.
+    private void SeedDummyData()
+    {
+        userInfo = new MyProfileUserInfo
+        {
+            ProfileImageUrl = "mikepb.jpg",
+            Name = "Test Bruger",
+            Email = "test@example.com",
+            UserName = "testuser",
+            Role = "customer",
+            Phone = "12 34 56 78",
+            Address = "Testvej 1, 1234 By",
+            MemberSince = DateTime.UtcNow.AddYears(-1)
+        };
+
+        activeListings = new List<MyProfileListing>
+        {
+            new MyProfileListing
+            {
+                Title = "Brugt cykel",
+                Price = 500,
+                Status = "active",
+                CreatedAt = DateTime.UtcNow.AddDays(-5),
+                UpdatedAt = DateTime.UtcNow.AddDays(-1)
+            },
+            new MyProfileListing
+            {
+                Title = "Gaming stol",
+                Price = 800,
+                Status = "active",
+                CreatedAt = DateTime.UtcNow.AddDays(-2),
+                UpdatedAt = DateTime.UtcNow.AddDays(-2)
+            }
+        };
+
+        inactiveOrSoldListings = new List<MyProfileListing>
+        {
+            new MyProfileListing
+            {
+                Title = "Smartphone",
+                Price = 1200,
+                Status = "sold",
+                CreatedAt = DateTime.UtcNow.AddMonths(-2),
+                UpdatedAt = DateTime.UtcNow.AddMonths(-1)
+            },
+            new MyProfileListing
+            {
+                Title = "Bogreol",
+                Price = 300,
+                Status = "inactive",
+                CreatedAt = DateTime.UtcNow.AddMonths(-1),
+                UpdatedAt = DateTime.UtcNow.AddDays(-10)
+            }
+        };
+
+        purchaseHistory = new List<MyProfilePurchase>
+        {
+            new MyProfilePurchase
+            {
+                ItemTitle = "Brugt skærm",
+                Price = 700,
+                PurchasedAt = DateTime.UtcNow.AddDays(-20),
+                SellerName = "Anders"
+            },
+            new MyProfilePurchase
+            {
+                ItemTitle = "Hovedtelefoner",
+                Price = 350,
+                PurchasedAt = DateTime.UtcNow.AddDays(-7),
+                SellerName = "Maria"
+            }
+        };
+    }
+}
+}
