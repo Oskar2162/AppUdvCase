@@ -206,7 +206,6 @@ else
 }
 
 @code {
-    // Kun UI-tilstande – senere erstatter du SeedDummyData() med kald til dine services.
     private bool isLoading = true;
     private string? loadError;
 
@@ -215,15 +214,22 @@ else
     private List<MyProfileListing> inactiveOrSoldListings = new();
     private List<MyProfilePurchase> purchaseHistory = new();
 
+    // NYT: liste over testbrugere + valgt bruger
+    private List<TestUser> allUsers = new();
+    private string? selectedUserId;
+
     protected override async Task OnInitializedAsync()
     {
         try
         {
-            // Her kan du senere hente "user" fra localStorage og kalde dine service-klasser.
-            // User? loggedIn = await localStorage.GetItemAsync<User?>("user");
-            // Hvis I har en MyProfileService, kan du bruge den her til at hente data fra API/MongoDb.
-
-            SeedDummyData(); // Midlertidigt så UI virker
+            // Her kunne du senere bruge login-info i stedet for dummy
+            InitializeTestUsers();
+            // Start med første bruger:
+            selectedUserId = allUsers.FirstOrDefault()?.Id;
+            if (selectedUserId != null)
+            {
+                LoadDataForUser(selectedUserId);
+            }
         }
         catch (Exception ex)
         {
@@ -235,7 +241,186 @@ else
         }
     }
 
-    // Midlertidige modeller KUN til UI.
+    private void OnSelectedUserChanged(ChangeEventArgs e)
+    {
+        selectedUserId = e.Value?.ToString();
+        if (!string.IsNullOrEmpty(selectedUserId))
+        {
+            LoadDataForUser(selectedUserId);
+        }
+    }
+
+    // Dummy-brugere og deres data
+    private void InitializeTestUsers()
+    {
+        allUsers = new List<TestUser>
+        {
+            new TestUser { Id = "u1", DisplayName = "Bruger 1 - Sælger" },
+            new TestUser { Id = "u2", DisplayName = "Bruger 2 - Køber" },
+            new TestUser { Id = "u3", DisplayName = "Bruger 3 - Blandt" }
+        };
+    }
+
+    private void LoadDataForUser(string userId)
+    {
+        // I stedet for én SeedDummyData laver vi 3 varianter:
+        switch (userId)
+        {
+            case "u1":
+                SeedUser1();
+                break;
+            case "u2":
+                SeedUser2();
+                break;
+            case "u3":
+                SeedUser3();
+                break;
+        }
+    }
+
+    private void SeedUser1()
+    {
+        userInfo = new MyProfileUserInfo
+        {
+            ProfileImageUrl = "images/mikepb.jpg",
+            Name = "Sælger Mike",
+            Email = "sandra@example.com",
+            UserName = "seller_sandra",
+            Role = "seller",
+            Phone = "11 11 11 11",
+            Address = "Sælgervej 1, 1000 By",
+            MemberSince = DateTime.UtcNow.AddYears(-2)
+        };
+
+        activeListings = new List<MyProfileListing>
+        {
+            new MyProfileListing
+            {
+                Title = "Mountainbike",
+                Price = 1500,
+                Status = "active",
+                CreatedAt = DateTime.UtcNow.AddDays(-3),
+                UpdatedAt = DateTime.UtcNow.AddDays(-1)
+            }
+        };
+
+        inactiveOrSoldListings = new List<MyProfileListing>
+        {
+            new MyProfileListing
+            {
+                Title = "Sofa",
+                Price = 800,
+                Status = "sold",
+                CreatedAt = DateTime.UtcNow.AddMonths(-3),
+                UpdatedAt = DateTime.UtcNow.AddMonths(-2)
+            }
+        };
+
+        purchaseHistory = new List<MyProfilePurchase>(); // ingen køb
+    }
+
+    private void SeedUser2()
+    {
+        userInfo = new MyProfileUserInfo
+        {
+            ProfileImageUrl = "images/simonpb.JPG",
+            Name = "Køber Simon",
+            Email = "karl@example.com",
+            UserName = "buyer_karl",
+            Role = "buyer",
+            Phone = "22 22 22 22",
+            Address = "Købervej 2, 2000 By",
+            MemberSince = DateTime.UtcNow.AddMonths(-6)
+        };
+
+        activeListings = new List<MyProfileListing>(); // ingen aktive annoncer
+
+        inactiveOrSoldListings = new List<MyProfileListing>(); // ingen solgte/inaktive (som sælger)
+
+        purchaseHistory = new List<MyProfilePurchase>
+        {
+            new MyProfilePurchase
+            {
+                ItemTitle = "Spisebord",
+                Price = 1200,
+                PurchasedAt = DateTime.UtcNow.AddDays(-10),
+                SellerName = "Sælger Sandra"
+            },
+            new MyProfilePurchase
+            {
+                ItemTitle = "Lampe",
+                Price = 250,
+                PurchasedAt = DateTime.UtcNow.AddDays(-5),
+                SellerName = "Lars"
+            }
+        };
+    }
+
+    private void SeedUser3()
+    {
+        userInfo = new MyProfileUserInfo
+        {
+            ProfileImageUrl = "images/casemiropb.png",
+            Name = "Mikset Maja",
+            Email = "maja@example.com",
+            UserName = "mix_maja",
+            Role = "buyer/seller",
+            Phone = "33 33 33 33",
+            Address = "Mixvej 3, 3000 By",
+            MemberSince = DateTime.UtcNow.AddYears(-1)
+        };
+
+        activeListings = new List<MyProfileListing>
+        {
+            new MyProfileListing
+            {
+                Title = "Bogreol",
+                Price = 300,
+                Status = "active",
+                CreatedAt = DateTime.UtcNow.AddDays(-1),
+                UpdatedAt = DateTime.UtcNow
+            }
+        };
+
+        inactiveOrSoldListings = new List<MyProfileListing>
+        {
+            new MyProfileListing
+            {
+                Title = "TV",
+                Price = 2000,
+                Status = "sold",
+                CreatedAt = DateTime.UtcNow.AddMonths(-1),
+                UpdatedAt = DateTime.UtcNow.AddDays(-20)
+            },
+            new MyProfileListing
+            {
+                Title = "Kontorstol",
+                Price = 400,
+                Status = "inactive",
+                CreatedAt = DateTime.UtcNow.AddMonths(-2),
+                UpdatedAt = DateTime.UtcNow.AddDays(-30)
+            }
+        };
+
+        purchaseHistory = new List<MyProfilePurchase>
+        {
+            new MyProfilePurchase
+            {
+                ItemTitle = "Headset",
+                Price = 600,
+                PurchasedAt = DateTime.UtcNow.AddDays(-15),
+                SellerName = "Køber Karl"
+            }
+        };
+    }
+
+    // Hjælpeklasser
+    private class TestUser
+    {
+        public string Id { get; set; } = "";
+        public string DisplayName { get; set; } = "";
+    }
+
     private class MyProfileUserInfo
     {
         public string? ProfileImageUrl { get; set; }
@@ -264,79 +449,4 @@ else
         public DateTime PurchasedAt { get; set; }
         public string SellerName { get; set; } = "";
     }
-
-    // Dummy-data – fjernes når vi kobler til vores services/API.
-    private void SeedDummyData()
-    {
-        userInfo = new MyProfileUserInfo
-        {
-            ProfileImageUrl = "mikepb.jpg",
-            Name = "Test Bruger",
-            Email = "test@example.com",
-            UserName = "testuser",
-            Role = "customer",
-            Phone = "12 34 56 78",
-            Address = "Testvej 1, 1234 By",
-            MemberSince = DateTime.UtcNow.AddYears(-1)
-        };
-
-        activeListings = new List<MyProfileListing>
-        {
-            new MyProfileListing
-            {
-                Title = "Brugt cykel",
-                Price = 500,
-                Status = "active",
-                CreatedAt = DateTime.UtcNow.AddDays(-5),
-                UpdatedAt = DateTime.UtcNow.AddDays(-1)
-            },
-            new MyProfileListing
-            {
-                Title = "Gaming stol",
-                Price = 800,
-                Status = "active",
-                CreatedAt = DateTime.UtcNow.AddDays(-2),
-                UpdatedAt = DateTime.UtcNow.AddDays(-2)
-            }
-        };
-
-        inactiveOrSoldListings = new List<MyProfileListing>
-        {
-            new MyProfileListing
-            {
-                Title = "Smartphone",
-                Price = 1200,
-                Status = "sold",
-                CreatedAt = DateTime.UtcNow.AddMonths(-2),
-                UpdatedAt = DateTime.UtcNow.AddMonths(-1)
-            },
-            new MyProfileListing
-            {
-                Title = "Bogreol",
-                Price = 300,
-                Status = "inactive",
-                CreatedAt = DateTime.UtcNow.AddMonths(-1),
-                UpdatedAt = DateTime.UtcNow.AddDays(-10)
-            }
-        };
-
-        purchaseHistory = new List<MyProfilePurchase>
-        {
-            new MyProfilePurchase
-            {
-                ItemTitle = "Brugt skærm",
-                Price = 700,
-                PurchasedAt = DateTime.UtcNow.AddDays(-20),
-                SellerName = "Anders"
-            },
-            new MyProfilePurchase
-            {
-                ItemTitle = "Hovedtelefoner",
-                Price = 350,
-                PurchasedAt = DateTime.UtcNow.AddDays(-7),
-                SellerName = "Maria"
-            }
-        };
-    }
-}
 }
