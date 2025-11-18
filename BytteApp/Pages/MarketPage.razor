@@ -1,8 +1,10 @@
 @page "/Market"
 <h3>Tilføj annonce</h3>
 @using BytteApp.Components
+@using BytteApp.Service
 @using Core
 @inject NavigationManager NavManager
+@inject ProductService
 
 @if (products.Count > 0)
 {
@@ -110,11 +112,6 @@
         
         Console.WriteLine($"A new product is added: {aProduct.Name}");
         aProduct = new Product();
-    }
-    
-    protected override void OnInitialized()
-    {
-        //Intet endnu, skal forbindes til MongoDB server
     }
     
     private void ResetForm()
