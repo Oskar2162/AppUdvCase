@@ -1,0 +1,134 @@
+@page "/Market"
+<h3>Tilføj annonce</h3>
+@using BytteApp.Components
+@using Core
+@inject NavigationManager NavManager
+
+@if (products.Count > 0)
+{
+    <h2 class="mt-4">Product</h2>
+    <table class="table table-striped">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Location</th>
+            <th>Price</th>
+            <th>Published</th>
+            <th>Description</th>
+        </tr>
+        </thead>
+        <tbody>
+        @foreach (var p in products)
+        {
+            <tr>
+                <td>@p.Name</td>
+                <td>@p.Location</td>
+                <td>@p.Price</td>
+                <td>@(p.IsPublished ? "Yes" : "No")</td>
+                <td>@p.Description</td>
+            </tr>
+        }
+        </tbody>
+    </table>
+}
+
+<button class="btn btn-info" @onclick="GoToAddProduct">Tilføj annonce</button>
+
+<ModalDialog @ref="addModalDialog" Title="Tilføj annonce...">
+    <EditForm Model="@aProduct" OnValidSubmit="@HandleSubmit" class="row p-3">
+        <DataAnnotationsValidator />
+        <ValidationSummary />
+    
+        <div class="col-md-12 mb-3">
+            <label for="Name">Name</label>
+            <InputText id="Name" @bind-Value="aProduct.Name" class="form-control" />
+        </div>
+    
+        
+    
+        <div class="col-md-6 mb-3">
+            <label for="PublishedDate">Published Date</label>
+            <InputDate id="PublishedDate" @bind-Value="aProduct.PublishedDate" class="form-control" />
+        </div>
+    
+        <div class="col-md-6 mb-3">
+            <label for="Stock">Price</label>
+            <InputNumber id="Price" @bind-Value="aProduct.Price" class="form-control" />
+        </div>
+    
+        <div class="col-md-6 mb-3">
+            <label for="Location">Location</label>
+            <InputSelect id="Location" @bind-Value="aProduct.Location" class="form-control">
+                <option value="">-- Select a category --</option>
+                @foreach (var loc in Location)
+                {
+                    <option value="@loc">@loc</option>
+                }
+            </InputSelect>
+        </div>
+    
+        <div class="col-md-12 mb-3">
+            <label for="Description">Description</label>
+            <InputTextArea id="Description" @bind-Value="aProduct.Description" class="form-control" />
+        </div>
+    
+        <div class="col-12 mb-3">
+            <InputCheckbox id="IsPublished" class="form-check-input" @bind-Value="aProduct.IsPublished"/>
+            <label class="form-check-label" for="IsPublished">Is Published</label>
+        </div>
+    
+        <div class="col-1 mb-3">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+    
+        <div class="col-1 mb-3">
+            <button class="btn btn-primary" @onclick="ResetForm">Reset</button>
+        </div>
+    </EditForm>
+</ModalDialog>
+
+
+
+@code {
+    private List<Product> products = new();
+    
+    ModalDialog? addModalDialog { get; set; }
+    
+    private async Task HandleSubmit()
+    {
+        products.Add(new Product
+        {
+            Name = aProduct.Name,
+            PublishedDate = aProduct.PublishedDate,
+            Price = aProduct.Price,
+            Location = aProduct.Location,
+            Description = aProduct.Description,
+            IsPublished = aProduct.IsPublished
+                        
+                    
+        });
+        
+        Console.WriteLine($"A new product is added: {aProduct.Name}");
+        aProduct = new Product();
+    }
+    
+    protected override void OnInitialized()
+    {
+        //Intet endnu, skal forbindes til MongoDB server
+    }
+    
+    private void ResetForm()
+    {
+        aProduct = new Product();
+    }
+
+    private Product aProduct = new();
+    private List<string> Location = new() { "Lokale A1.06" };
+    
+    
+
+    private void GoToAddProduct()
+    {
+        addModalDialog?.Open();
+    }
+}

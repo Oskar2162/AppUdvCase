@@ -14,7 +14,12 @@
     </ItemGroup>
 
     <ItemGroup>
+      <Folder Include="Logic\" />
       <Folder Include="Service\" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <ProjectReference Include="..\Core\Core.csproj" />
     </ItemGroup>
 
 </Project>
