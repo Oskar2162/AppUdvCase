@@ -4,9 +4,17 @@
 @using BytteApp.Service
 @using Core
 @inject NavigationManager NavManager
-@inject ProductService
+@inject ProductService productService
 
-@if (products.Count > 0)
+@if (products is null)
+{
+    <p>Loading products...</p>
+}
+else if (products.Count == 0)
+{
+    <p>Ingen annoncer lige nu</p>
+}
+else
 {
     <h2 class="mt-4">Product</h2>
     <table class="table table-striped">
@@ -93,27 +101,25 @@
 
 @code {
     private List<Product> products = new();
-    
+
     ModalDialog? addModalDialog { get; set; }
-    
+
+    protected override async Task OnInitializedAsync()
+    {
+        products = await productService.GetAll();
+    }
+
     private async Task HandleSubmit()
     {
-        products.Add(new Product
-        {
-            Name = aProduct.Name,
-            PublishedDate = aProduct.PublishedDate,
-            Price = aProduct.Price,
-            Location = aProduct.Location,
-            Description = aProduct.Description,
-            IsPublished = aProduct.IsPublished
-                        
-                    
-        });
-        
-        Console.WriteLine($"A new product is added: {aProduct.Name}");
+        await productService.Add(aProduct); // ⭐ SEND TIL SERVER
+
+        // Hent listen igen
+        products = await productService.GetAll();
+
+        addModalDialog?.Close();
         aProduct = new Product();
     }
-    
+
     private void ResetForm()
     {
         aProduct = new Product();
@@ -121,11 +127,12 @@
 
     private Product aProduct = new();
     private List<string> Location = new() { "Lokale A1.06" };
-    
-    
+
+
 
     private void GoToAddProduct()
     {
         addModalDialog?.Open();
     }
+
 }
