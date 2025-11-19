@@ -1,5 +1,7 @@
-namespace ServerApp.Repositories;
 using Core;
+
+namespace ServerApp1.Repositories;
+using BytteApp.Models;
 
 public interface ProductRepository
 {

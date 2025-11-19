@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace ServerApp.Model
+namespace BytteApp.Models
 {
     public class User
     {
@@ -19,7 +19,7 @@ namespace ServerApp.Model
         public string Email { get; set; }
         public string role { get; set; }
         
-        public List<Tannonce> Tannonces{ get; set; } = new List<Tannonce>();
+        public List<Tannonce> tannonces{ get; set; } = new List<Tannonce>();
 
     }
 }
