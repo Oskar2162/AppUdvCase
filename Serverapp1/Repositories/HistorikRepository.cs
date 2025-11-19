@@ -1,5 +1,6 @@
+using BytteApp.Models;
 using MongoDB.Driver;
-using ServerApp.Model;
+using BytteApp.Models;
 
 namespace ServerApp.Repositories
 {
