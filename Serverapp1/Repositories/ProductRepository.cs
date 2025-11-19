@@ -1,7 +1,7 @@
 using Core;
+using Serverapp1.Model;
 
 namespace ServerApp1.Repositories;
-using BytteApp.Models;
 
 public interface ProductRepository
 {

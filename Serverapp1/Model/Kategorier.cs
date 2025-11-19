@@ -6,7 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace BytteApp.Models
+namespace Serverapp1.Model
 {
     public class Kategorier
     {
