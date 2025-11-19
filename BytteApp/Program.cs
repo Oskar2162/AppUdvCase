@@ -12,6 +12,6 @@ builder.Services.AddScoped(sp => new HttpClient
     BaseAddress = new Uri("http://localhost:5102") 
 });
 
-builder.Services.AddScoped<ProductService, ProductServiceHttp>();
+builder.Services.AddScoped<AnnonceService, AnnonceServiceHttp>();
 
 await builder.Build().RunAsync();
