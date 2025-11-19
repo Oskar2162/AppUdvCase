@@ -4,7 +4,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BytteApp", "BytteApp\BytteA
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Core", "Core\Core.csproj", "{1CD80BE5-68F9-4978-B847-DF759C0EFD81}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ServerApp", "ServerApp\ServerApp.csproj", "{2670699D-6F50-4007-92CE-34093C74132B}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Serverapp1", "Serverapp1\Serverapp1.csproj", "{1DAF725E-614F-4D64-AE43-644188516AA1}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -20,9 +20,9 @@ Global
 		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1CD80BE5-68F9-4978-B847-DF759C0EFD81}.Release|Any CPU.Build.0 = Release|Any CPU
-		{2670699D-6F50-4007-92CE-34093C74132B}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{2670699D-6F50-4007-92CE-34093C74132B}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{2670699D-6F50-4007-92CE-34093C74132B}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{2670699D-6F50-4007-92CE-34093C74132B}.Release|Any CPU.Build.0 = Release|Any CPU
+		{1DAF725E-614F-4D64-AE43-644188516AA1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{1DAF725E-614F-4D64-AE43-644188516AA1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{1DAF725E-614F-4D64-AE43-644188516AA1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{1DAF725E-614F-4D64-AE43-644188516AA1}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal

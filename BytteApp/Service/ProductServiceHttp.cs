@@ -14,17 +14,17 @@ public class ProductServiceHttp : ProductService
 
     public async Task<List<Product>?> GetAll()
     {
-        return await client.GetFromJsonAsync<List<Product>?>($"{Server.Url}/product");
+        return await client.GetFromJsonAsync<List<Product>?>($"api/product");
     }
 
     public async Task Add(Product p)
     {
-        await client.PostAsJsonAsync($"{Server.Url}/product", p);
+        await client.PostAsJsonAsync($"api/product", p);
     }
 
     public async Task DeleteById(int id)
     {
-        var endPoint = $"{Server.Url}/delete/product?id={id}";
+        var endPoint = $"{Server.Url}/api/product/{id}";
         await client.DeleteAsync(endPoint);
     }
 }
