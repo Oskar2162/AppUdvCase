@@ -1,8 +1,7 @@
-using BytteApp.Models;
 using MongoDB.Driver;
-using BytteApp.Models;
+using Serverapp1.Model;
 
-namespace ServerApp.Repositories
+namespace Serverapp1.Repositories
 {
     public class HistorikRepository
     {
