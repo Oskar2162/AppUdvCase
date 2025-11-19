@@ -4,9 +4,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using BytteApp.Models;
+using Serverapp1.Model;
 
-namespace ServerApp.Repositories
+namespace Serverapp1.Repositories
 {
     public class UsersRepository
     {
