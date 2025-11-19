@@ -10,9 +10,9 @@ public class AnnonceController : ControllerBase
 {
     private readonly AnnonceRepository repository;
 
-    public AnnonceController(AnnonceRepository repository)
+    public AnnonceController()
     {
-        this.repository = repository;
+        this.repository = new AnnonceRepository();
     }
 
     // GET: api/annonce
