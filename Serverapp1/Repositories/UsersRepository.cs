@@ -1,14 +1,14 @@
 ﻿using MongoDB.Driver;
-using ServerApp.Model;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using BytteApp.Models;
 
 namespace ServerApp.Repositories
 {
-    public class LokaliteterRepository
+    public class UsersRepository
     {
         private string connectionString = "mongodb://localhost:27017";
 
@@ -16,31 +16,34 @@ namespace ServerApp.Repositories
 
         IMongoDatabase database;
 
-        IMongoCollection<Lokalitet> collection;
+        IMongoCollection<User> collection;
 
-        public LokaliteterRepository()
+        public UsersRepository()
         {
             mongoClient = new MongoClient(connectionString);
 
             database = mongoClient.GetDatabase("tøj_mongodb");
 
-            collection = database.GetCollection<Lokalitet>("lokaliteter");
+            collection = database.GetCollection<User>("users");
 
+        }
+        public void CreateUsers(List<User> users)
+        {
+            collection.InsertMany(users);
         }
         
         public void DeleteAll()
         {
             collection.DeleteMany(_ => true);
         }
+        public void Addbookings(int userid, Kategorier bl)
 
-        public void newLokalitet(Lokalitet lokalitet)
         {
-           collection.InsertOneAsync(lokalitet);
+            var filter = Builders<User>.Filter.Eq("id", userid);
+            var update = Builders<User>.Update.Push<Kategorier>("Bookings", bl);
+            
+            collection.UpdateOne(filter, update);
         }
-
         
-       
-
-
     }
 }
