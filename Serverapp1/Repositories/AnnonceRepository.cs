@@ -60,5 +60,12 @@ namespace Serverapp1.Repositories
             var filter = Builders<Annonce>.Filter.Eq(a => a.annonceid, aid);
             return collection.Find(filter).FirstOrDefault();
         }
+        
+        public void UpdateAnnonce(Annonce annonce)
+        {
+            var filter = Builders<Annonce>.Filter.Eq(a => a.annonceid, annonce.annonceid);
+
+            collection.ReplaceOne(filter, annonce);
+        }
     }
 }

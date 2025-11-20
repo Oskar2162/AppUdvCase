@@ -133,7 +133,7 @@ else
     private async Task RequestPurchase(int id)
     {
         await annonceService.SendPurchaseRequest(id);
-        annoncer = await annonceService.GetAll();
+        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
         StateHasChanged();
     }
 }
