@@ -20,4 +20,6 @@ public class Annonce
 
     // Brug fx "Active" / "Inactive" som simple statusværdier
     public string Status { get; set; } = "Active";
+
+    public string userid { get; set; } = string.Empty;
 }

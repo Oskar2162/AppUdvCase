@@ -32,8 +32,13 @@ public class UserService
 
     public User? Login(string usernameid, string password)
     {
-        return users.FirstOrDefault(u =>
+        var user = users.FirstOrDefault(u =>
             u.UserNameid.Equals(usernameid, StringComparison.OrdinalIgnoreCase)
             && u.Password == password);
+
+        CurrentUser = user;
+        return user;
     }
+
+    public User? CurrentUser { get; set; }
 }

@@ -3,6 +3,7 @@
 @using BytteApp.Service
 @using Core
 @inject AnnonceService annonceService
+@inject UserService userService
 
 <h3>Tilføj annonce</h3>
 
@@ -142,10 +143,17 @@ else
         };
     }
     
-    private async Task RequestPurchase(int id)
+    private async Task RequestPurchase(int annonceId)
     {
-        await annonceService.SendPurchaseRequest(id);
-        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
+        var user = userService.CurrentUser;
+
+        if (user == null)
+        {
+            Console.WriteLine("Ingen bruger logget ind.");
+            return;
+        }
+        await annonceService.SendPurchaseRequest(annonceId, user.userid);
+        annoncer = await annonceService.GetAll();
         StateHasChanged();
     }
 }
