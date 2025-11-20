@@ -42,8 +42,29 @@ else
                 <td>@a.Status</td>
                 <td>@a.description</td>
                 <td>
-                    <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.annonceid)">Slet</button>
-                    <button class="btn btn-sm btn-success" @onclick="() => RequestPurchase(a.annonceid)">Køb</button>
+
+                    @* Hvis JEG er sælgeren *@
+                    @if (a.userid == loginState.LoggedInUser)
+                    {
+                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.annonceid)">Slet</button>
+
+                        @if (!string.IsNullOrEmpty(a.BuyerUserId))
+                        {
+                            <!-- Der er en købsanmodning -->
+                            <button class="btn btn-primary btn-sm ms-2" @onclick="() => Approve(a.annonceid)">Godkend</button>
+                            <button class="btn btn-warning btn-sm ms-2" @onclick="() => Reject(a.annonceid)">Afvis</button>
+                        }
+                        else
+                        {
+                            <small class="text-muted ms-2">Ingen anmodning</small>
+                        }
+                    }
+                    else
+                    {
+                        @* Hvis JEG ikke er sælgeren *@
+                        <button class="btn btn-sm btn-success" @onclick="() => RequestPurchase(a.annonceid)">Køb</button>
+                    }
+
                 </td>
             </tr>
         }
@@ -165,17 +186,31 @@ else
             Status = "Active"
         };
     }
-    
+
     private async Task RequestPurchase(int annonceId)
     {
-        var user = userService.CurrentUser;
 
-        if (user == null)
+        if (!loginState.IsLoggedIn())
         {
-            Console.WriteLine("Ingen bruger logget ind.");
+            Console.WriteLine("Ingen bruger logget ind");
             return;
         }
-        await annonceService.SendPurchaseRequest(annonceId, user.userid);
+
+        await annonceService.SendPurchaseRequest(annonceId, loginState.LoggedInUser!);
+
+        annoncer = await annonceService.GetAll();
+        StateHasChanged();
+    }
+    private async Task Approve(int annonceId)
+    {
+        await annonceService.Approve(annonceId);
+        annoncer = await annonceService.GetAll();
+        StateHasChanged();
+    }
+
+    private async Task Reject(int annonceId)
+    {
+        await annonceService.Reject(annonceId);
         annoncer = await annonceService.GetAll();
         StateHasChanged();
     }

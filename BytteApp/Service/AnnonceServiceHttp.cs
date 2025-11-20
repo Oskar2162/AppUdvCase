@@ -27,9 +27,18 @@ public class AnnonceServiceHttp : AnnonceService
         return client.DeleteAsync($"api/annonce/{id}");
     }
 
-    public Task SendPurchaseRequest(int annonceId, string userId)
+    public async Task SendPurchaseRequest(int annonceId, string userId)
     {
         var body = JsonContent.Create(userId);
-        return client.PostAsync($"api/annonce/purchase/{annonceId}", body);
+        var resp = await client.PostAsync($"api/annonce/purchase/{annonceId}", body);
+    }
+    public async Task Approve(int id)
+    {
+        await client.PostAsync($"api/annonce/approve/{id}", null);
+    }
+
+    public async Task Reject(int id)
+    {
+        await client.PostAsync($"api/annonce/reject/{id}", null);
     }
 }
