@@ -30,6 +30,14 @@ public class AnnonceController : ControllerBase
         if (a == null) return NotFound();
         return a;
     }
+    
+    [HttpGet("by-user/{userid}")]
+    public ActionResult<List<Annonce>> GetByUser(string userid)
+    {
+        if (string.IsNullOrWhiteSpace(userid)) return BadRequest("userid mangler");
+        var list = repository.GetByUserId(userid);
+        return Ok(list);
+    }
 
     // POST: api/annonce
     [HttpPost]
