@@ -1,7 +1,5 @@
 using System.Net.Http;
 using System.Net.Http.Json;
-using System.Threading.Tasks;
-using System.Collections.Generic;
 
 namespace BytteApp.Service;
 
@@ -29,14 +27,13 @@ public class AnnonceBilledeService : IAnnonceBilledeService
 
         if (response.IsSuccessStatusCode)
         {
-            // key er filnavnet som FileController har lavet
-            return (true, key);
+            return (true, key);  // key = filnavn
         }
 
         return (false, response.ReasonPhrase ?? "Ukendt fejl");
     }
 
-    // Hent liste med alle fil-navne
+    // Hent liste med alle filnavne
     public async Task<List<string>> GetAllKeys()
     {
         var keys =
@@ -46,18 +43,20 @@ public class AnnonceBilledeService : IAnnonceBilledeService
         return keys;
     }
 
-    // Byg URL (HttpClient.BaseAddress + relative path)
+    //  KORREKT: returnér fuld URL så billeder kan vises
     public string ConvertToUrl(string key)
     {
-        // hvis HttpClient har BaseAddress = "http://localhost:5092/"
-        // bliver det til: http://localhost:5092/api/files/{key}
-        return $"{BasePath}/{key}";
+        var baseAddress = _http.BaseAddress?.ToString().TrimEnd('/');
+
+        // Ex: http://localhost:5097/api/files/theimage.jpg
+        return $"{baseAddress}/{BasePath}/{key}";
     }
 
-    // Slet en fil
+    // Slet en fil fra serveren
     public async Task<(bool success, string info)> DeleteFile(string filename)
     {
         var resp = await _http.DeleteAsync($"{BasePath}/{filename}");
+
         if (resp.IsSuccessStatusCode)
         {
             return (true, "Fil slettet");

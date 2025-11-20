@@ -6,7 +6,8 @@
 @using Microsoft.AspNetCore.Components.Forms
 
 @inject AnnonceService AnnonceService                 
-@inject IAnnonceBilledeService AnnonceBilledeServicebilledeService         
+@inject IAnnonceBilledeService BilledeService
+
 
 <h3>Tilføj annonce</h3>
 
@@ -49,7 +50,7 @@ else
                 <td>
                     @if (!string.IsNullOrEmpty(a.imageKey))
                     {
-                        <img src="@AnnonceBilledeServicebilledeService.ConvertToUrl(a.imageKey)" 
+                        <img src="@BilledeService.ConvertToUrl(a.imageKey)" 
                              alt="Annoncebillede" width="80" />
                     }
                 </td>
@@ -132,7 +133,7 @@ else
             @if (!string.IsNullOrEmpty(newAnnonce.imageKey))
             {
                 <div class="mt-2">
-                    <img src="@AnnonceBilledeServicebilledeService.ConvertToUrl(newAnnonce.imageKey)" 
+                    <img src="@BilledeService.ConvertToUrl(newAnnonce.imageKey)" 
                          alt="Preview" width="120" />
                 </div>
             }
@@ -178,7 +179,7 @@ else
         using var stream = file.OpenReadStream(maxAllowedSize: 10_000_000);
 
         // Upload filen til API'en via billedservice
-        var (success, info) = await AnnonceBilledeServicebilledeService.SendFile(file.Name, stream);
+        var (success, info) = await BilledeService.SendFile(file.Name, stream);
 
         if (success)
         {
@@ -217,7 +218,7 @@ else
         if (annonce is not null && !string.IsNullOrEmpty(annonce.imageKey))
         {
             // Slet billedfilen fra serveren
-            await AnnonceBilledeServicebilledeService.DeleteFile(annonce.imageKey);
+            await BilledeService.DeleteFile(annonce.imageKey);
         }
 
         // Slet selve annoncen i databasen
