@@ -46,4 +46,19 @@ public class AnnonceController : ControllerBase
         repository.DeleteById(id);
         return NoContent();
     }
+    
+    [HttpPost("purchase/{id:int}")]
+    public IActionResult PurchaseRequest(int id)
+    {
+        var annonce = repository.GetAnnonceById(id);
+
+        if (annonce == null)
+            return NotFound();
+
+        annonce.Status = "Der er sendt en købsanmodning";
+
+        repository.UpdateAnnonce(annonce);
+
+        return Ok();
+    }
 }

@@ -41,6 +41,7 @@ else
                 <td>@a.description</td>
                 <td>
                     <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.annonceid)">Slet</button>
+                    <button class="btn btn-sm btn-success" @onclick="() => RequestPurchase(a.annonceid)">Køb</button>
                 </td>
             </tr>
         }
@@ -127,5 +128,12 @@ else
     private void ResetForm()
     {
         newAnnonce = new Annonce();
+    }
+    
+    private async Task RequestPurchase(int id)
+    {
+        await annonceService.SendPurchaseRequest(id);
+        annoncer = await annonceService.GetAll();
+        StateHasChanged();
     }
 }
