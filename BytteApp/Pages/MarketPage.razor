@@ -3,6 +3,7 @@
 @using BytteApp.Service
 @using Core
 @inject AnnonceService annonceService
+@inject BytteApp.Service.LoginState loginState
 
 <h3>Tilføj annonce</h3>
 
@@ -50,11 +51,11 @@ else
 
 <button class="btn btn-info" @onclick="OpenModal">Tilføj annonce</button>
 
-<ModalDialog @ref="addModalDialog" Title="Tilføj annonce...">
-    <EditForm Model="@newAnnonce" OnValidSubmit="@HandleSubmit" class="row p-3">
+<ModalDialog @ref="addModalDialog" Title="Ny annonce">
+    <EditForm Model="newAnnonce" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-
+        
         <div class="col-md-6 mb-3">
             <label for="AnnonceId">Annonce Id</label>
             <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" disabled />
@@ -84,19 +85,26 @@ else
             <label for="Description">Beskrivelse</label>
             <InputTextArea id="Description" @bind-Value="newAnnonce.description" class="form-control" />
         </div>
-        
-        <!-- Skjult felt eller info om bruger-id (valgfrit at vise) -->
-        @if (!string.IsNullOrEmpty(newAnnonce.userid))
+
+        @* Vis kun hvis sat *@
+        @if (!string.IsNullOrWhiteSpace(newAnnonce.userid))
         {
-            <div class="col-md-12 mb-3">
-                <small>BrugerId (fastgjort): @newAnnonce.userid</small>
+            <div class="col-md-12 mb-2">
+                <small>Bruger: @newAnnonce.userid</small>
             </div>
         }
 
         <div class="col-12 mb-3">
-            <button type="submit" class="btn btn-primary">Gem</button>
+            <button type="submit" class="btn btn-primary" disabled="@(!loginState.IsLoggedIn())">Gem</button>
             <button type="button" class="btn btn-secondary ms-2" @onclick="ResetForm">Nulstil</button>
         </div>
+
+        @if(!loginState.IsLoggedIn())
+        {
+            <div class="alert alert-warning">
+                Du skal være logget ind for at oprette en annonce.
+            </div>
+        }
     </EditForm>
 </ModalDialog>
 
@@ -105,26 +113,32 @@ else
     private Annonce newAnnonce = new();
     private ModalDialog? addModalDialog;
 
-    
     private static readonly Random _rand = new();
 
     protected override async Task OnInitializedAsync()
     {
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
+        PrepareNewAnnonce();
     }
 
     private void OpenModal()
     {
-        newAnnonce = CreateNewAnnonce(); // nyt objekt med tilfældigt id
+        PrepareNewAnnonce();
         addModalDialog?.Open();
     }
 
     private async Task HandleSubmit()
     {
+        if(!loginState.IsLoggedIn())
+            return; // sikkerhed
+
+        // Sørg for at userid er opdateret lige før send
+        newAnnonce.userid = loginState.LoggedInUser!;
+
         await annonceService.Add(newAnnonce);
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
         addModalDialog?.Close();
-        newAnnonce = CreateNewAnnonce(); // klar til næste
+        PrepareNewAnnonce();
         StateHasChanged();
     }
 
@@ -137,15 +151,16 @@ else
 
     private void ResetForm()
     {
-        newAnnonce = CreateNewAnnonce();
+        PrepareNewAnnonce();
     }
 
-    private Annonce CreateNewAnnonce()
+    private void PrepareNewAnnonce()
     {
-        return new Annonce
+        newAnnonce = new Annonce
         {
-            // 6-cifret id, simpelt og hurtigt
-            annonceid = _rand.Next(100000, 1000000)
+            annonceid = _rand.Next(1, 100000),
+            userid = loginState.LoggedInUser ?? string.Empty, // tom hvis ikke logget ind
+            Status = "Active"
         };
     }
 }
