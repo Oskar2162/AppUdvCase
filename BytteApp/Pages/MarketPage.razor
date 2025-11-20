@@ -251,10 +251,10 @@ else
         }
 
         // Slet selve annoncen i databasen
-        await AnnonceService.DeleteById(id);
+        await annonceService.DeleteById(id);
 
         // Hent opdateret liste
-        annoncer = await AnnonceService.GetAll() ?? new List<Annonce>();
+        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
 
         StateHasChanged();
     }
@@ -270,8 +270,8 @@ else
         {
             annonceid = _rand.Next(1, 100000),
             userid = loginState.LoggedInUser ?? string.Empty, // tom hvis ikke logget ind
-            Status = "Active"
-            uploadStatus = "";
+            Status = "Active",
+            
         };
     
     }
