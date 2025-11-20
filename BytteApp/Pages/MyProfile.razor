@@ -109,40 +109,7 @@ else
             </div>
         </div>
 
-        <!-- Boks 3: Solgte / inaktive annoncer -->
-        <div class="col-12">
-            <div class="card shadow-sm">
-                <div class="card-header bg-secondary text-white">
-                    <h5 class="mb-0">Mine solgte og inaktive annoncer</h5>
-                </div>
-                <div class="card-body">
-                    @if (inactiveOrSoldListings == null || !inactiveOrSoldListings.Any())
-                    {
-                        <p>Du har ingen solgte eller inaktive annoncer.</p>
-                    }
-                    else
-                    {
-                        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-                            @foreach (var listing in inactiveOrSoldListings)
-                            {
-                                var isSold = listing.Status.Equals("sold", StringComparison.OrdinalIgnoreCase);
-                                <div class="col">
-                                    <div class="card h-100 bg-light text-muted">
-                                        <div class="card-body">
-                                            <h6 class="card-title">@listing.Title</h6>
-                                            <p class="card-text mb-1">Pris: @listing.Price.ToString("C")</p>
-                                            <span class="badge @(isSold ? "bg-dark" : "bg-secondary")">
-                                                @(isSold ? "Solgt" : "Inaktiv")
-                                            </span>
-                                        </div>
-                                    </div>
-                                </div>
-                            }
-                        </div>
-                    }
-                </div>
-            </div>
-        </div>
+        
 
         <!-- Boks 4: Indkøbshistorik (placeholder - ingen datakilde endnu) -->
         <div class="col-12">
