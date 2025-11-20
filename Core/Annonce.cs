@@ -25,5 +25,7 @@ public class Annonce
     public string? imageKey { get; set; }
     
     // NYT: bruger-id som string (beholder format som hos LoginState/UserService)
-    public string userid { get; set; }
+    public string? userid { get; set; }
+    
+    public string? BuyerUserId { get; set; }
 }
