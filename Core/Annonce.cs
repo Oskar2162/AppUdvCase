@@ -23,4 +23,7 @@ public class Annonce
 
     //  NØGLE TIL BILLEDET PÅ SERVEREN
     public string? imageKey { get; set; }
+    
+    // NYT: bruger-id som string (beholder format som hos LoginState/UserService)
+    public string userid { get; set; }
 }

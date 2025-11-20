@@ -5,9 +5,11 @@
 @using Core
 @using Microsoft.AspNetCore.Components.Forms
 
-@inject AnnonceService AnnonceService                 
+                 
 @inject IAnnonceBilledeService BilledeService
 
+@inject AnnonceService annonceService
+@inject BytteApp.Service.LoginState loginState
 
 <h3>Tilføj annonce</h3>
 
@@ -75,18 +77,14 @@ else
 @* Knappen der åbner modal-vinduet for at oprette ny annonce *@
 <button class="btn btn-info" @onclick="OpenModal">Tilføj annonce</button>
 
-@* Modal dialog for oprettelse af ny annonce *@
-<ModalDialog @ref="addModalDialog" Title="Tilføj annonce...">
-
-    @* Formular til oprettelse af annonce *@
-    <EditForm Model="@newAnnonce" OnValidSubmit="@HandleSubmit" class="row p-3">
+<ModalDialog @ref="addModalDialog" Title="Ny annonce">
+    <EditForm Model="newAnnonce" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-
-        @* --- FELTER TIL ANNONCE --- *@
+        
         <div class="col-md-6 mb-3">
             <label for="AnnonceId">Annonce Id</label>
-            <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" />
+            <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" disabled />
         </div>
 
         <div class="col-md-6 mb-3">
@@ -138,14 +136,25 @@ else
                 </div>
             }
         </div>
+        @* Vis kun hvis sat *@
+        @if (!string.IsNullOrWhiteSpace(newAnnonce.userid))
+        {
+            <div class="col-md-12 mb-2">
+                <small>Bruger: @newAnnonce.userid</small>
+            </div>
+        }
 
-        @* --- KNAPPER --- *@
         <div class="col-12 mb-3">
-            <button type="submit" class="btn btn-primary">Gem</button>
-            <button type="button" class="btn btn-secondary ms-2" @onclick="ResetForm">
-                Nulstil
-            </button>
+            <button type="submit" class="btn btn-primary" disabled="@(!loginState.IsLoggedIn())">Gem</button>
+            <button type="button" class="btn btn-secondary ms-2" @onclick="ResetForm">Nulstil</button>
         </div>
+
+        @if(!loginState.IsLoggedIn())
+        {
+            <div class="alert alert-warning">
+                Du skal være logget ind for at oprette en annonce.
+            </div>
+        }
     </EditForm>
 </ModalDialog>
 
@@ -156,17 +165,18 @@ else
 
     private string uploadStatus = "";        // Tekst der viser status på billedupload
 
+    private static readonly Random _rand = new();
+
     protected override async Task OnInitializedAsync()
     {
-        // Hent alle annoncer når siden loader
-        annoncer = await AnnonceService.GetAll() ?? new List<Annonce>();
+        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
+        PrepareNewAnnonce();
     }
 
     private void OpenModal()
     {
-        // Nulstil formular når modal åbnes
-        newAnnonce = new Annonce();
-        uploadStatus = "";
+        
+        PrepareNewAnnonce();
         addModalDialog?.Open();
     }
 
@@ -194,19 +204,17 @@ else
 
     private async Task HandleSubmit()
     {
-        // GEMMER ANNONCEN (inkl. imageKey hvis sat)
-        await AnnonceService.Add(newAnnonce);
+        if(!loginState.IsLoggedIn())
+            return; // sikkerhed
 
-        // Hent opdateret liste
-        annoncer = await AnnonceService.GetAll() ?? new List<Annonce>();
+        // Sørg for at userid er opdateret lige før send
+        newAnnonce.userid = loginState.LoggedInUser!;
 
-        // Luk modal
+        await annonceService.Add(newAnnonce);
+        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
         addModalDialog?.Close();
-
-        // Nulstil formular
-        newAnnonce = new Annonce();
-        uploadStatus = "";
-
+        
+        PrepareNewAnnonce();
         StateHasChanged();
     }
 
@@ -232,8 +240,18 @@ else
 
     private void ResetForm()
     {
-        // Nulstiller formular og billede status
-        newAnnonce = new Annonce();
-        uploadStatus = "";
+        PrepareNewAnnonce();
+    }
+
+    private void PrepareNewAnnonce()
+    {
+        newAnnonce = new Annonce
+        {
+            annonceid = _rand.Next(1, 100000),
+            userid = loginState.LoggedInUser ?? string.Empty, // tom hvis ikke logget ind
+            Status = "Active"
+            uploadStatus = "";
+        };
+    
     }
 }

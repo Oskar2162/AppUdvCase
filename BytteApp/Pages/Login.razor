@@ -1,0 +1,39 @@
+@page "/"
+@page "/login"
+    
+@inject BytteApp.Service.UserService UserService
+@inject BytteApp.Service.LoginState LoginState
+@inject NavigationManager Nav
+
+<h3>Login</h3>
+
+@if (!string.IsNullOrEmpty(ErrorMessage))
+{
+    <p style="color:red">@ErrorMessage</p>
+}
+
+<input @bind="Username" placeholder="Brugernavn" class="form-control" />
+<br />
+<input @bind="Password" placeholder="Kodeord" type="password" class="form-control" />
+<br />
+<button class="btn btn-primary" @onclick="HandleLogin">Login</button>
+
+@code {
+    private string Username = "";
+    private string Password = "";
+    private string? ErrorMessage;
+
+    private void HandleLogin()
+    {
+        var user = UserService.Login(Username, Password);
+
+        if (user == null)
+        {
+            ErrorMessage = "Forkert brugernavn eller kodeord!";
+            return;
+        }
+
+        LoginState.Login(user.userid);
+        Nav.NavigateTo("/Market");
+    }
+}

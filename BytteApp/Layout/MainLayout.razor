@@ -1,18 +1,37 @@
-﻿@inherits LayoutComponentBase
+﻿@using BytteApp.Service
+@inherits LayoutComponentBase
+@inject LoginState LoginState
+
 <div class="page">
-    <div class="sidebar">
-        <NavMenu/>
-    </div>
+
+    @if (LoginState.IsLoggedIn())
+    {
+        <div class="sidebar">
+            <NavMenu />
+        </div>
+    }
 
     <main>
         <div class="top-row px-4">
-            <NavLink class="nav-link" href="myprofile">
-                <span class="bi bi-person-square" aria-hidden="true"></span>
-            </NavLink>
+            @if (LoginState.IsLoggedIn())
+            {
+                <span class="me-3">Hejsa, @LoginState.LoggedInUser 👋</span>
+
+                <NavLink class="nav-link" href="myprofile">
+                    <span class="bi bi-person-square" aria-hidden="true"></span>
+                </NavLink>
+            }
         </div>
+
 
         <article class="content px-4">
             @Body
         </article>
     </main>
+</div>
+
+<div id="blazor-error-ui" data-nosnippet>
+    An unhandled error has occurred.
+    <a href="." class="reload">Reload</a>
+    <span class="dismiss">🗙</span>
 </div>
