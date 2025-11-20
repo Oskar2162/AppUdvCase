@@ -58,7 +58,7 @@ else
 
         <div class="col-md-6 mb-3">
             <label for="AnnonceId">Annonce Id</label>
-            <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" />
+            <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" disabled />
         </div>
 
         <div class="col-md-6 mb-3">
@@ -98,6 +98,9 @@ else
     private Annonce newAnnonce = new();
     private ModalDialog? addModalDialog;
 
+    
+    private static readonly Random _rand = new();
+
     protected override async Task OnInitializedAsync()
     {
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
@@ -105,7 +108,7 @@ else
 
     private void OpenModal()
     {
-        newAnnonce = new Annonce(); // reset
+        newAnnonce = CreateNewAnnonce(); // nyt objekt med tilfældigt id
         addModalDialog?.Open();
     }
 
@@ -114,7 +117,7 @@ else
         await annonceService.Add(newAnnonce);
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
         addModalDialog?.Close();
-        newAnnonce = new Annonce();
+        newAnnonce = CreateNewAnnonce(); // klar til næste
         StateHasChanged();
     }
 
@@ -127,7 +130,16 @@ else
 
     private void ResetForm()
     {
-        newAnnonce = new Annonce();
+        newAnnonce = CreateNewAnnonce();
+    }
+
+    private Annonce CreateNewAnnonce()
+    {
+        return new Annonce
+        {
+            // 6-cifret id, simpelt og hurtigt
+            annonceid = _rand.Next(100000, 1000000)
+        };
     }
     
     private async Task RequestPurchase(int id)
