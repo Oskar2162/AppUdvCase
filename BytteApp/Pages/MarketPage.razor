@@ -84,6 +84,14 @@ else
             <label for="Description">Beskrivelse</label>
             <InputTextArea id="Description" @bind-Value="newAnnonce.description" class="form-control" />
         </div>
+        
+        <!-- Skjult felt eller info om bruger-id (valgfrit at vise) -->
+        @if (!string.IsNullOrEmpty(newAnnonce.userid))
+        {
+            <div class="col-md-12 mb-3">
+                <small>BrugerId (fastgjort): @newAnnonce.userid</small>
+            </div>
+        }
 
         <div class="col-12 mb-3">
             <button type="submit" class="btn btn-primary">Gem</button>
