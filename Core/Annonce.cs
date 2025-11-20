@@ -20,6 +20,7 @@ public class Annonce
 
     // Brug fx "Active" / "Inactive" som simple statusværdier
     public string Status { get; set; } = "Active";
-
+    
+    // NYT: bruger-id som string (beholder format som hos LoginState/UserService)
     public string userid { get; set; } = string.Empty;
 }

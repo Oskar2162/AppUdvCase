@@ -66,6 +66,10 @@ namespace Serverapp1.Repositories
             var filter = Builders<Annonce>.Filter.Eq(a => a.annonceid, annonce.annonceid);
 
             collection.ReplaceOne(filter, annonce);
+        public List<Annonce> GetByUserId(string userid)
+        {
+            var filter = Builders<Annonce>.Filter.Eq(a => a.userid, userid);
+            return collection.Find(filter).ToList();
         }
     }
 }
