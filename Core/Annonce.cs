@@ -22,5 +22,5 @@ public class Annonce
     public string Status { get; set; } = "Active";
     
     // NYT: bruger-id som string (beholder format som hos LoginState/UserService)
-    public string userid { get; set; } = string.Empty;
+    public string userid { get; set; }
 }
