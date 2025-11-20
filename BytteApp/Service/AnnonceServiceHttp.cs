@@ -17,6 +17,12 @@ public class AnnonceServiceHttp : AnnonceService
         return client.GetFromJsonAsync<List<Annonce>?>("api/annonce");
     }
 
+    public Task<List<Annonce>?> GetByUser(string userid)
+    {
+        // Bruger nyt endpoint i AnnonceController: GET api/annonce/by-user/{userid}
+        return client.GetFromJsonAsync<List<Annonce>?>(@$"api/annonce/by-user/{userid}");
+    }
+
     public async Task Add(Annonce annonce)
     {
         await client.PostAsJsonAsync("api/annonce", annonce);
