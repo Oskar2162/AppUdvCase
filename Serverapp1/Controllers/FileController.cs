@@ -9,7 +9,7 @@ public class FileController : ControllerBase
     // sæt PATH til en mappe, hvor serveren må skrive filer.
     // Under udvikling kan du bruge en absolut sti, fx i din brugerprofil,
     // eller du kan bruge wwwroot: Path.Combine(_env.WebRootPath, "UploadedImages")
-    private string PATH = @"C:\Users\nurit\Pictures\uploadpictures";
+    private string PATH = @"BytteApp/wwwroot/images";
     // her filer vil blive gemt
 
     // provide fileupload - the file is copied to the PATH and given
