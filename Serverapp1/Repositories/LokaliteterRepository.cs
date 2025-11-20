@@ -33,7 +33,7 @@ namespace Serverapp1.Repositories
             collection.DeleteMany(_ => true);
         }
 
-        public void newLokalitet(Lokalitet lokalitet)
+        public void NewLokalitet(Lokalitet lokalitet)
         {
            collection.InsertOneAsync(lokalitet);
         }
