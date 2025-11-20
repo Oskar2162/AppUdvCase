@@ -13,7 +13,13 @@ builder.Services.AddScoped<LoginState>();
 
 
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
-builder.Services.AddScoped<ProductService, ProductServiceHttp>();
+
+
+builder.Services.AddScoped(sp => new HttpClient
+{
+    BaseAddress = new Uri("http://localhost:5097") 
+});
+
+builder.Services.AddScoped<AnnonceService, AnnonceServiceHttp>();
 
 await builder.Build().RunAsync();

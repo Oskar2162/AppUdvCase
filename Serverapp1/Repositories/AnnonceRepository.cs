@@ -4,9 +4,10 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
-using Serverapp1.Model;
+using Core;
 
-namespace ServerApp1.Repositories
+
+namespace Serverapp1.Repositories
 {
     public class AnnonceRepository
     {
@@ -27,20 +28,32 @@ namespace ServerApp1.Repositories
             collection = database.GetCollection<Annonce>("annoncer");
         }
 
+        // Ny: Create enkel annonce
+        public void CreateAnnonce(Annonce annonce)
+        {
+            collection.InsertOne(annonce);
+        }
+
         public void CreateAnnoncer(List<Annonce> annoncer)
-            {
-                collection.InsertMany(annoncer);
-            }
+        {
+            collection.InsertMany(annoncer);
+        }
+
         public void DeleteAll()
         {
             collection.DeleteMany(_ => true);
         }
-        
+
+        // Ny: Delete by id
+        public void DeleteById(int aid)
+        {
+            collection.DeleteOne(a => a.annonceid == aid);
+        }
+
         public List<Annonce> GetAll()
         {
             return collection.Find(_ => true).ToList();
         }
-
 
         public Annonce GetAnnonceById(int aid)
         {
@@ -48,5 +61,4 @@ namespace ServerApp1.Repositories
             return collection.Find(filter).FirstOrDefault();
         }
     }
-    }
-
+}

@@ -18,19 +18,10 @@
     </select>
 </div>
 
-@if (isLoading)
-{
-    <p><em>Loading profile...</em></p>
-}
-else if (!string.IsNullOrEmpty(loadError))
-{
-    <div class="alert alert-danger">@loadError</div>
-}
-else
-{
+@{
     <div class="row g-4">
         <!-- Boks 1: Brugerinformation -->
-        <!-- Boks 1: Brugerinformation -->
+       
         <div class="col-12 col-lg-6">
             <div class="card shadow-sm">
                 <div class="card-header bg-primary text-white">

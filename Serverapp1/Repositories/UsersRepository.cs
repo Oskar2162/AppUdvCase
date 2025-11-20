@@ -31,6 +31,11 @@ namespace Serverapp1.Repositories
         {
             collection.InsertMany(users);
         }
+
+        public List<User> GetAll()
+        {
+            return collection.Find(_ => true).ToList();
+        }
         
         public void DeleteAll()
         {
