@@ -20,4 +20,7 @@ public class Annonce
 
     // Brug fx "Active" / "Inactive" som simple statusværdier
     public string Status { get; set; } = "Active";
+
+    //  NØGLE TIL BILLEDET PÅ SERVEREN
+    public string? imageKey { get; set; }
 }
