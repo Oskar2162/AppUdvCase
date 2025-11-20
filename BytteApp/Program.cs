@@ -19,9 +19,13 @@ builder.Services.AddSingleton<LoginState>();
 
 builder.Services.AddScoped(sp => new HttpClient
 {
-    BaseAddress = new Uri("http://localhost:5097") 
+    BaseAddress = new Uri("http://localhost:5097")
 });
 
+// Annonce service
 builder.Services.AddScoped<AnnonceService, AnnonceServiceHttp>();
+
+//  Billedservice – *HTTP-implementationen*
+builder.Services.AddScoped<IAnnonceBilledeService, AnnonceBilledeService>();
 
 await builder.Build().RunAsync();
