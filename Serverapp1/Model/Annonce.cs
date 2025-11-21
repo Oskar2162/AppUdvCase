@@ -8,7 +8,6 @@ using System.Threading.Tasks;
 
 namespace Serverapp1.Model
 {
-    // Modelklasse for en annonce – beskriver felterne på en annonce i databasen
     public class Annonce
     {
         // [BsonId] = dette felt er dokumentets primære id i MongoDB

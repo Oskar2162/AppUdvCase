@@ -8,7 +8,6 @@ using Core;
 
 namespace Serverapp1.Repositories
 {
-    // Repository = klasse der står for at snakke med databasen om "Annonce"-data
     public class AnnonceRepository
     {
         // Adresse til vores MongoDB-server (lokalt på computeren)

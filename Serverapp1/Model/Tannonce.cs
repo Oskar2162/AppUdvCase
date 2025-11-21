@@ -16,19 +16,14 @@ namespace Serverapp1.Model
         [BsonRepresentation(BsonType.Int32)]
         public int tannonceid { get; set; }
 
-        // Pris på Tannonce
         public int price { get; set; }
 
-        // Titel på Tannonce
         public string title { get; set; }
 
-        // Beskrivelse
         public string description { get; set; }
 
-        // Id på lokalitet
         public int lid { get; set; }
 
-        // Status (f.eks. "Aktiv", "Solgt")
         public string Status { get; set; }
     }
 }

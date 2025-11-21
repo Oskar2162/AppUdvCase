@@ -3,7 +3,6 @@ using Serverapp1.Model;
 
 namespace Serverapp1.Repositories
 {
-    // Repository til at arbejde med købs-historik i databasen
     public class HistorikRepository
     {
         // Adresse til MongoDB-serveren

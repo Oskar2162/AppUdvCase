@@ -3,7 +3,7 @@ using Serverapp1.Model;
 
 namespace ServerApp1.Repositories;
 
-// Interface = en "kontrakt", der siger hvilke metoder en produkt-repository skal have
+
 public interface ProductRepository
 {
     // Skal kunne hente alle produkter
