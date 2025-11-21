@@ -2,11 +2,11 @@ using BytteApp.Models;
 
 namespace BytteApp.Service;
 
-public class UserService
+public class UserService // Definere klassen UserService
 {
-    private List<User> users = new()
+    private List<User> users = new() //Opretter liste af brugere
     {
-        new User { 
+        new User { // Et objekt kaldet User
             userid = "A",
             Name = "Mohamed",
             UserNameid = "Mohamed33",
@@ -30,15 +30,15 @@ public class UserService
             PhoneNumber = 14141414, }
     };
 
-    public User? Login(string usernameid, string password)
+    public User? Login(string usernameid, string password) // Metode kaldet Login. Modtager usernameid og password
     {
-        var user = users.FirstOrDefault(u =>
+        var user = users.FirstOrDefault(u => // søger i listen over users og finder den hvor brugernavn og password matcher
             u.UserNameid.Equals(usernameid, StringComparison.OrdinalIgnoreCase)
             && u.Password == password);
 
-        CurrentUser = user;
-        return user;
+        CurrentUser = user; // Hvis de matcher gemmes brugeren i CurrentUser så der huskes hvem der er logget ind
+        return user; // returnere user hvis det matcher, returnere null hvis det ikke matcher
     }
 
-    public User? CurrentUser { get; set; }
+    public User? CurrentUser { get; set; } // sætter egenskaben CurrentUser
 }

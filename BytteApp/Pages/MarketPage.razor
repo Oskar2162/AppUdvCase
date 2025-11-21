@@ -66,25 +66,26 @@ else
                 @* Slet-knap *@
                 <td>
 
-                    @* Hvis JEG er sælgeren *@
+                    @* Dette er til når jeg har oprettet en annonce *@
                     @if (a.userid == loginState.LoggedInUser)
                     {
                         <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.annonceid)">Slet</button>
 
-                        @if (!string.IsNullOrEmpty(a.BuyerUserId))
+                        @if (!string.IsNullOrEmpty(a.BuyerUserId)) @* vis hvis der er nogen der har budt *@
                         {
-                            <!-- Der er en købsanmodning -->
+                            <!-- Når der er sendt en købsanmodning får sælgeren (den der har oprettet annoncen) disse muligheder  -->
                             <button class="btn btn-primary btn-sm ms-2" @onclick="() => Approve(a.annonceid)">Godkend</button>
                             <button class="btn btn-warning btn-sm ms-2" @onclick="() => Reject(a.annonceid)">Afvis</button>
                         }
                         else
                         {
+                            <!-- Når der ikke er nogen anmodninger vises dette -->
                             <small class="text-muted ms-2">Ingen anmodning</small>
                         }
                     }
                     else
                     {
-                        @* Hvis JEG ikke er sælgeren *@
+                        @* Hvis jeg er køber (ikke selv har oprettet annoncen) *@
                         <button class="btn btn-sm btn-success" @onclick="() => RequestPurchase(a.annonceid)">Køb</button>
                     }
 
@@ -102,7 +103,7 @@ else
     <EditForm Model="newAnnonce" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-        
+        @* Kalder newAnnonce i linje 185 *@
         <div class="col-md-6 mb-3">
             <label for="AnnonceId">Annonce Id</label>
             <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" disabled />
@@ -226,13 +227,13 @@ else
     private async Task HandleSubmit()
     {
         if(!loginState.IsLoggedIn())
-            return; // sikkerhed
+            return; // sikkerhed tjekker om brugeren er logget ind ved at kalde IsLoggedIn i LoginState
 
         // Sørg for at userid er opdateret lige før send
         newAnnonce.userid = loginState.LoggedInUser!;
 
-        await annonceService.Add(newAnnonce);
-        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
+        await annonceService.Add(newAnnonce); // Send annonce til server
+        annoncer = await annonceService.GetAll() ?? new List<Annonce>(); // opdatere liste
         addModalDialog?.Close();
         
         PrepareNewAnnonce();
@@ -256,7 +257,7 @@ else
         // Hent opdateret liste
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
 
-        StateHasChanged();
+        StateHasChanged(); // Opdatere UI
     }
 
     private void ResetForm()
@@ -268,9 +269,9 @@ else
     {
         newAnnonce = new Annonce
         {
-            annonceid = _rand.Next(1, 100000),
-            userid = loginState.LoggedInUser ?? string.Empty, // tom hvis ikke logget ind
-            Status = "Active",
+            annonceid = _rand.Next(1, 100000), // Giver annoncen et tilfældigt ID
+            userid = loginState.LoggedInUser ?? string.Empty, // tom hvis man ikke er logget ind
+            Status = "Active", // Annoncen er aktiv
             
         };
     
@@ -279,28 +280,28 @@ else
     private async Task RequestPurchase(int annonceId)
     {
 
-        if (!loginState.IsLoggedIn())
+        if (!loginState.IsLoggedIn()) // Tjekker om bruger er logget ind
         {
             Console.WriteLine("Ingen bruger logget ind");
             return;
         }
 
-        await annonceService.SendPurchaseRequest(annonceId, loginState.LoggedInUser!);
+        await annonceService.SendPurchaseRequest(annonceId, loginState.LoggedInUser!); // Sender købeanmodning. Kalder asynkron metode i AnnonceServiceHttp
 
-        annoncer = await annonceService.GetAll();
+        annoncer = await annonceService.GetAll(); // Opdatere listen lokalt med data fra server så man kan se om der er anmodet i klienten
         StateHasChanged();
     }
     private async Task Approve(int annonceId)
     {
-        await annonceService.Approve(annonceId);
-        annoncer = await annonceService.GetAll();
+        await annonceService.Approve(annonceId); // Kalder metoden Approve i annonceServiceHttp og godkender et køb på annoncen med dét annonceId
+        annoncer = await annonceService.GetAll(); // Henter en opdateret version af listen med den nye status
         StateHasChanged();
     }
 
-    private async Task Reject(int annonceId)
+    private async Task Reject(int annonceId) // Kalder metoden Reject i annonceServiceHttp og afviser et køb på annoncen med dét annonceId
     {
         await annonceService.Reject(annonceId);
-        annoncer = await annonceService.GetAll();
+        annoncer = await annonceService.GetAll(); // Henter en opdateret version af listen med den nye status
         StateHasChanged();
     }
 }
