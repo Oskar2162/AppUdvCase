@@ -1,11 +1,20 @@
 @page "/Market"
+
 @using BytteApp.Components
 @using BytteApp.Service
 @using Core
+@using Microsoft.AspNetCore.Components.Forms
+
+                 
+@inject IAnnonceBilledeService BilledeService
+
 @inject AnnonceService annonceService
+@inject UserService userService
+@inject BytteApp.Service.LoginState loginState
 
 <h3>Tilføj annonce</h3>
 
+@* Viser status hvis annoncer endnu ikke er hentet *@
 @if (annoncer is null)
 {
     <p>Loading annoncer...</p>
@@ -17,11 +26,14 @@ else if (annoncer.Count == 0)
 else
 {
     <h2 class="mt-4">Annoncer</h2>
+
+    @* Liste af alle annoncer i en tabel *@
     <table class="table table-striped">
         <thead>
         <tr>
             <th>Annonce Id</th>
             <th>Titel</th>
+            <th>Billede</th>   @* NYT – billedevisning *@
             <th>Pris</th>
             <th>Lokalitet Id</th>
             <th>Status</th>
@@ -29,18 +41,54 @@ else
             <th>Handling</th>
         </tr>
         </thead>
+
         <tbody>
         @foreach (var a in annoncer)
         {
             <tr>
                 <td>@a.annonceid</td>
                 <td>@a.title</td>
+
+                @* Hvis annoncen har et billede, vis det *@
+                <td>
+                    @if (!string.IsNullOrEmpty(a.imageKey))
+                    {
+                        <img src="@BilledeService.ConvertToUrl(a.imageKey)" 
+                             alt="Annoncebillede" width="80" />
+                    }
+                </td>
+
                 <td>@a.price</td>
                 <td>@a.lid</td>
                 <td>@a.Status</td>
                 <td>@a.description</td>
+
+                @* Slet-knap *@
                 <td>
-                    <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.annonceid)">Slet</button>
+
+                    @* Dette er til når jeg har oprettet en annonce *@
+                    @if (a.userid == loginState.LoggedInUser)
+                    {
+                        <button class="btn btn-sm btn-danger" @onclick="() => Delete(a.annonceid)">Slet</button>
+
+                        @if (!string.IsNullOrEmpty(a.BuyerUserId)) @* vis hvis der er nogen der har budt *@
+                        {
+                            <!-- Når der er sendt en købsanmodning får sælgeren (den der har oprettet annoncen) disse muligheder  -->
+                            <button class="btn btn-primary btn-sm ms-2" @onclick="() => Approve(a.annonceid)">Godkend</button>
+                            <button class="btn btn-warning btn-sm ms-2" @onclick="() => Reject(a.annonceid)">Afvis</button>
+                        }
+                        else
+                        {
+                            <!-- Når der ikke er nogen anmodninger vises dette -->
+                            <small class="text-muted ms-2">Ingen anmodning</small>
+                        }
+                    }
+                    else
+                    {
+                        @* Hvis jeg er køber (ikke selv har oprettet annoncen) *@
+                        <button class="btn btn-sm btn-success" @onclick="() => RequestPurchase(a.annonceid)">Køb</button>
+                    }
+
                 </td>
             </tr>
         }
@@ -48,13 +96,14 @@ else
     </table>
 }
 
+@* Knappen der åbner modal-vinduet for at oprette ny annonce *@
 <button class="btn btn-info" @onclick="OpenModal">Tilføj annonce</button>
 
-<ModalDialog @ref="addModalDialog" Title="Tilføj annonce...">
-    <EditForm Model="@newAnnonce" OnValidSubmit="@HandleSubmit" class="row p-3">
+<ModalDialog @ref="addModalDialog" Title="Ny annonce">
+    <EditForm Model="newAnnonce" OnValidSubmit="HandleSubmit">
         <DataAnnotationsValidator />
         <ValidationSummary />
-
+        @* Kalder newAnnonce i linje 185 *@
         <div class="col-md-6 mb-3">
             <label for="AnnonceId">Annonce Id</label>
             <InputNumber id="AnnonceId" @bind-Value="newAnnonce.annonceid" class="form-control" disabled />
@@ -84,68 +133,175 @@ else
             <label for="Description">Beskrivelse</label>
             <InputTextArea id="Description" @bind-Value="newAnnonce.description" class="form-control" />
         </div>
-        
-        <!-- Skjult felt eller info om bruger-id (valgfrit at vise) -->
-        @if (!string.IsNullOrEmpty(newAnnonce.userid))
+
+        @* --- BILLEDEUPLOAD --- *@
+        <div class="col-md-12 mb-3">
+            <label for="Image">Billede</label><br />
+
+            @* Brugeren vælger et billede fra sin computer *@
+            <InputFile OnChange="OnImageSelected" />
+
+            @* Tekst feedback til upload *@
+            @if (!string.IsNullOrEmpty(uploadStatus))
+            {
+                <div class="mt-1">
+                    <small class="text-muted">@uploadStatus</small>
+                </div>
+            }
+
+            @* Billede-preview efter upload *@
+            @if (!string.IsNullOrEmpty(newAnnonce.imageKey))
+            {
+                <div class="mt-2">
+                    <img src="@BilledeService.ConvertToUrl(newAnnonce.imageKey)" 
+                         alt="Preview" width="120" />
+                </div>
+            }
+        </div>
+        @* Vis kun hvis sat *@
+        @if (!string.IsNullOrWhiteSpace(newAnnonce.userid))
         {
-            <div class="col-md-12 mb-3">
-                <small>BrugerId (fastgjort): @newAnnonce.userid</small>
+            <div class="col-md-12 mb-2">
+                <small>Bruger: @newAnnonce.userid</small>
             </div>
         }
 
         <div class="col-12 mb-3">
-            <button type="submit" class="btn btn-primary">Gem</button>
+            <button type="submit" class="btn btn-primary" disabled="@(!loginState.IsLoggedIn())">Gem</button>
             <button type="button" class="btn btn-secondary ms-2" @onclick="ResetForm">Nulstil</button>
         </div>
+
+        @if(!loginState.IsLoggedIn())
+        {
+            <div class="alert alert-warning">
+                Du skal være logget ind for at oprette en annonce.
+            </div>
+        }
     </EditForm>
 </ModalDialog>
 
 @code {
-    private List<Annonce>? annoncer;
-    private Annonce newAnnonce = new();
-    private ModalDialog? addModalDialog;
+    private List<Annonce>? annoncer;         // Liste af annoncer hentet fra API
+    private Annonce newAnnonce = new();      // Model til formularen i modal
+    private ModalDialog? addModalDialog;     // Reference til modal-komponenten
 
-    
+    private string uploadStatus = "";        // Tekst der viser status på billedupload
+
     private static readonly Random _rand = new();
 
     protected override async Task OnInitializedAsync()
     {
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
+        PrepareNewAnnonce();
     }
 
     private void OpenModal()
     {
-        newAnnonce = CreateNewAnnonce(); // nyt objekt med tilfældigt id
+        
+        PrepareNewAnnonce();
         addModalDialog?.Open();
+    }
+
+    @* --- BILLEDEUPLOAD LOGIK --- *@
+    private async Task OnImageSelected(InputFileChangeEventArgs e)
+    {
+        var file = e.File;
+
+        // Åbn filen som stream (max 10MB)
+        using var stream = file.OpenReadStream(maxAllowedSize: 10_000_000);
+
+        // Upload filen til API'en via billedservice
+        var (success, info) = await BilledeService.SendFile(file.Name, stream);
+
+        if (success)
+        {
+            newAnnonce.imageKey = info;           // Gem returned nøgle i annoncen
+            uploadStatus = "Billedet er uploadet.";
+        }
+        else
+        {
+            uploadStatus = $"Fejl ved upload: {info}";
+        }
     }
 
     private async Task HandleSubmit()
     {
-        await annonceService.Add(newAnnonce);
-        annoncer = await annonceService.GetAll() ?? new List<Annonce>();
+        if(!loginState.IsLoggedIn())
+            return; // sikkerhed tjekker om brugeren er logget ind ved at kalde IsLoggedIn i LoginState
+
+        // Sørg for at userid er opdateret lige før send
+        newAnnonce.userid = loginState.LoggedInUser!;
+
+        await annonceService.Add(newAnnonce); // Send annonce til server
+        annoncer = await annonceService.GetAll() ?? new List<Annonce>(); // opdatere liste
         addModalDialog?.Close();
-        newAnnonce = CreateNewAnnonce(); // klar til næste
+        
+        PrepareNewAnnonce();
         StateHasChanged();
     }
 
     private async Task Delete(int id)
     {
+        // Finder annoncen for at slette billedet også
+        var annonce = annoncer?.FirstOrDefault(a => a.annonceid == id);
+
+        if (annonce is not null && !string.IsNullOrEmpty(annonce.imageKey))
+        {
+            // Slet billedfilen fra serveren
+            await BilledeService.DeleteFile(annonce.imageKey);
+        }
+
+        // Slet selve annoncen i databasen
         await annonceService.DeleteById(id);
+
+        // Hent opdateret liste
         annoncer = await annonceService.GetAll() ?? new List<Annonce>();
-        StateHasChanged();
+
+        StateHasChanged(); // Opdatere UI
     }
 
     private void ResetForm()
     {
-        newAnnonce = CreateNewAnnonce();
+        PrepareNewAnnonce();
     }
 
-    private Annonce CreateNewAnnonce()
+    private void PrepareNewAnnonce()
     {
-        return new Annonce
+        newAnnonce = new Annonce
         {
-            // 6-cifret id, simpelt og hurtigt
-            annonceid = _rand.Next(100000, 1000000)
+            annonceid = _rand.Next(1, 100000), // Giver annoncen et tilfældigt ID
+            userid = loginState.LoggedInUser ?? string.Empty, // tom hvis man ikke er logget ind
+            Status = "Active", // Annoncen er aktiv
+            
         };
+    
+    }
+
+    private async Task RequestPurchase(int annonceId)
+    {
+
+        if (!loginState.IsLoggedIn()) // Tjekker om bruger er logget ind
+        {
+            Console.WriteLine("Ingen bruger logget ind");
+            return;
+        }
+
+        await annonceService.SendPurchaseRequest(annonceId, loginState.LoggedInUser!); // Sender købeanmodning. Kalder asynkron metode i AnnonceServiceHttp
+
+        annoncer = await annonceService.GetAll(); // Opdatere listen lokalt med data fra server så man kan se om der er anmodet i klienten
+        StateHasChanged();
+    }
+    private async Task Approve(int annonceId)
+    {
+        await annonceService.Approve(annonceId); // Kalder metoden Approve i annonceServiceHttp og godkender et køb på annoncen med dét annonceId
+        annoncer = await annonceService.GetAll(); // Henter en opdateret version af listen med den nye status
+        StateHasChanged();
+    }
+
+    private async Task Reject(int annonceId) // Kalder metoden Reject i annonceServiceHttp og afviser et køb på annoncen med dét annonceId
+    {
+        await annonceService.Reject(annonceId);
+        annoncer = await annonceService.GetAll(); // Henter en opdateret version af listen med den nye status
+        StateHasChanged();
     }
 }

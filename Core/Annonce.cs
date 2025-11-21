@@ -20,7 +20,12 @@ public class Annonce
 
     // Brug fx "Active" / "Inactive" som simple statusværdier
     public string Status { get; set; } = "Active";
+
+    //  NØGLE TIL BILLEDET PÅ SERVEREN
+    public string? imageKey { get; set; }
     
     // NYT: bruger-id som string (beholder format som hos LoginState/UserService)
-    public string userid { get; set; } = string.Empty;
+    public string? userid { get; set; }
+    
+    public string? BuyerUserId { get; set; }
 }
