@@ -81,8 +81,15 @@ namespace Serverapp1.Repositories
             return collection.Find(filter).FirstOrDefault();
         }
 
-        // Henter alle annoncer der tilhører en bestemt bruger (userid)
+        public void UpdateAnnonce(Annonce annonce)
+        {
+            var filter = Builders<Annonce>.Filter.Eq(a => a.annonceid, annonce.annonceid);
+
+            collection.ReplaceOne(filter, annonce);
+        }
+
         public List<Annonce> GetByUserId(string userid)
+
         {
             // Filter = find alle dokumenter, hvor feltet userid matcher det userid, vi får ind
             var filter = Builders<Annonce>.Filter.Eq(a => a.userid, userid);

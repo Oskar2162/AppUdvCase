@@ -84,4 +84,62 @@ public class AnnonceController : ControllerBase
         // Returnerer HTTP 204 NoContent (betyder: operationen lykkedes, men der er ingen body)
         return NoContent();
     }
+    [HttpPost("purchase/{id:int}")]
+    public IActionResult PurchaseRequest(int id, [FromBody] string userId)
+    {
+        var annonce = repository.GetAnnonceById(id);
+
+        if (annonce == null)
+            return NotFound();
+
+        annonce.Status = "Der er sendt en købsanmodning";
+        annonce.BuyerUserId = userId;
+        
+
+        repository.UpdateAnnonce(annonce);
+
+        return Ok();
+    }
+    // Godkend købsanmodning
+    [HttpPost("approve/{id:int}")]
+    public IActionResult ApprovePurchase(int id)
+    {
+        var annonce = repository.GetAnnonceById(id);
+
+        if (annonce == null)
+            return NotFound();
+
+        // Hvis ingen har anmodet
+        if (string.IsNullOrEmpty(annonce.BuyerUserId))
+            return BadRequest("Der er ingen købsanmodning at godkende");
+
+        // Sæt status til solgt
+        annonce.Status = "Solgt";
+
+        repository.UpdateAnnonce(annonce);
+
+        return Ok();
+    }
+
+// Afvis købsanmodning
+    [HttpPost("reject/{id:int}")]
+    public IActionResult RejectPurchase(int id)
+    {
+        var annonce = repository.GetAnnonceById(id);
+
+        if (annonce == null)
+            return NotFound();
+
+        // Hvis ingen har anmodet
+        if (string.IsNullOrEmpty(annonce.BuyerUserId))
+            return BadRequest("Der er ingen købsanmodning at afvise");
+
+        // Fjern køber-id og nulstil status
+        annonce.BuyerUserId = "";
+        annonce.Status = "Active";
+
+        repository.UpdateAnnonce(annonce);
+
+        return Ok();
+    }
 }
