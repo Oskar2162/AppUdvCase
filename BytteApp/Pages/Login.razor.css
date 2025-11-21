@@ -1,4 +1,39 @@
-h3 {
-    color: red;
+.login-container {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background: #f5f6fa;
 }
-    
+
+.login-box {
+    width: 100%;
+    max-width: 350px;
+    padding: 2rem;
+    background: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 18px rgba(0,0,0,0.1);
+}
+
+h2 {
+    font-weight: 600;
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    font-weight: 500;
+    margin-bottom: 0.3rem;
+    display: block;
+}
+
+.btn-primary {
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+@media (max-width: 480px) {
+    .login-box {
+        padding: 1.5rem;
+        max-width: 90%;
+    }
+}
