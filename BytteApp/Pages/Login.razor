@@ -1,9 +1,19 @@
 @page "/"
 @page "/login"
-    
+<!--
+Disse to linjer fortæller Blazor, at denne komponent vises på enten "/" eller "/login".
+Det betyder, at når man går til disse URL'er, så bliver denne login-side vist.
+-->
+
 @inject BytteApp.Service.UserService UserService
 @inject BytteApp.Service.LoginState LoginState
 @inject NavigationManager Nav
+<!--
+@inject bruges til at hente services ind i komponenten.
+- UserService: håndterer login-logik (tjekker brugernavn/kodeord)
+- LoginState: holder styr på om brugeren er logget ind
+- NavigationManager: gør det muligt at skifte side i app'en
+-->
 
 <h3>Login</h3>
 
@@ -11,29 +21,48 @@
 {
     <p style="color:red">@ErrorMessage</p>
 }
+<!--
+Hvis ErrorMessage IKKE er tom, viser vi en rød fejlbesked.
+Dette bruges når brugeren skriver forkert brugernavn/kodeord.
+-->
 
 <input @bind="Username" placeholder="Brugernavn" class="form-control" />
 <br />
 <input @bind="Password" placeholder="Kodeord" type="password" class="form-control" />
 <br />
 <button class="btn btn-primary" @onclick="HandleLogin">Login</button>
+<!--
+Input-felterne bruger @bind:
+- @bind="Username" betyder at feltet hele tiden opdaterer variablen Username
+- @bind="Password" gør det samme for Password
+
+Knappen kalder HandleLogin() når man klikker på den.
+-->
 
 @code {
-    private string Username = "";
-    private string Password = "";
-    private string? ErrorMessage;
+    // Variabler til binding med inputfelterne
+    private string Username { get; set; } = "";
+    private string Password { get; set; } = "";
+
+    // Hvis der sker fejl (forkert login), gemmer vi beskeden her
+    private string ErrorMessage { get; set; } = "";
 
     private void HandleLogin()
     {
+        // Kalder UserService.Login for at tjekke om brugernavn/kodeord matcher en bruger
         var user = UserService.Login(Username, Password);
 
+        // Hvis login mislykkes, sætter vi en fejlbesked og stopper metoden
         if (user == null)
         {
             ErrorMessage = "Forkert brugernavn eller kodeord!";
             return;
         }
 
+        // Hvis login lykkes, gemmer vi brugerens id i LoginState (så appen ved hvem der er logget ind)
         LoginState.Login(user.userid);
+
+        // Navigerer brugeren videre til Market-siden
         Nav.NavigateTo("/Market");
     }
 }
